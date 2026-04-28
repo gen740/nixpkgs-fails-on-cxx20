@@ -6,17 +6,28 @@
   outputs =
     { self, nixpkgs }:
     let
-      system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
+      systems = [
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-linux"
+        "x86_64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
-      packages.${system}.default = pkgs.stdenv.mkDerivation {
-        name = "hello-cxx20";
-        src = ./.;
-        nativeBuildInputs = [
-          pkgs.cmake
-          pkgs.ninja
-        ];
-      };
+      packages = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.llvmPackages.libcxxStdenv.mkDerivation {
+            name = "hello-cxx20";
+            src = ./.;
+            nativeBuildInputs = [
+              pkgs.cmake
+              pkgs.ninja
+            ];
+          };
+        });
     };
 }
