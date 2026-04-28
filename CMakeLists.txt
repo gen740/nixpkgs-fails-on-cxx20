@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 4.0)
+project(main)
+add_executable(main main.cpp)
+target_compile_features(main PRIVATE cxx_std_20)
+install(TARGETS main)
